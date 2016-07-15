@@ -365,7 +365,8 @@ IPsec PSK: <span id="setup-psk"></span></pre>
             "ssh_keys": null,
             "backups": false,
             "ipv6": false,
-            "user_data": "wget https://git.io/vpnsetup -O vpnsetup.sh && " +
+            "user_data": "#!/bin/bash\n\n" +
+            "wget https://git.io/vpnsetup -O vpnsetup.sh && " +
             "VPN_IPSEC_PSK='" + config.psk + "' " +
             "VPN_USER='" + config.username + "' " +
             "VPN_PASSWORD='" + config.password + "' " +
