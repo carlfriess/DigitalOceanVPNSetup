@@ -167,7 +167,8 @@
 
     <p class="active-3"><i class="ion-ios-checkmark-outline"></i></p>
 
-    <p class="active-3">All done! You're VPN server is ready to go!</p>
+    <!--<p class="active-3">All done! You're VPN server is ready to go!</p>-->
+    <p class="active-3">All done! You're VPN server is installing and should be up in a few minutes!</p>
 
     <pre class="active-3">
 L2TP over IPsec VPN Server:
@@ -257,7 +258,7 @@ IPsec PSK: <span id="setup-psk"></span></pre>
                 }
                 else {
                     document.getElementById("progressMsg").innerHTML = "Installing VPN server...";
-                    config.ip = res.droplet.networks.v6[0].ip_address;
+                    config.ip = res.droplet.networks.v4[0].ip_address;
                     waitForInstall(config);
                 }
             }
@@ -269,9 +270,9 @@ IPsec PSK: <span id="setup-psk"></span></pre>
     }
 
     function waitForInstall(config) {
-        var xhr = new XMLHttpRequest();
+        /*var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4 && xhr.status == 200) {
+            if (xhr.readyState == 4 && xhr.status == 200) {*/
                 setState(3);
                 document.getElementById("setup-ip").innerHTML = config.ip;
                 document.getElementById("setup-username").innerHTML = config.username;
@@ -292,14 +293,14 @@ IPsec PSK: <span id="setup-psk"></span></pre>
                 config.region + ")<\/string>\r\n\t\t\t\t<\/dict>\r\n\t\t\t<\/dict>\r\n\t\t<\/array>\r\n\t<\/dict>" +
                 "\r\n<\/dict>\r\n<\/plist>\r\n";
                 document.getElementById("configLink").href = "data:application/octet-stream;base64," + btoa(xml);
-            }
+            /*}
             else if (xhr.readyState == 4) {
                 xhr.abort();
                 setTimeout(function(){ waitForInstall(config); }, 10000);
             }
         };
         xhr.open("GET", "http://" + config.ip + "/", true);
-        xhr.send()
+        xhr.send()*/
     }
 
     var token = window.location.href.match(/#.*access_token=([0-9|a-z]+)/i);
@@ -370,8 +371,8 @@ IPsec PSK: <span id="setup-psk"></span></pre>
             "VPN_IPSEC_PSK='" + config.psk + "' " +
             "VPN_USER='" + config.username + "' " +
             "VPN_PASSWORD='" + config.password + "' " +
-            "sh vpnsetup.sh && " +
-            "wget http://dovpn.carlfriess.com/server && chmod +x ./server && ./server",
+            "sh vpnsetup.sh",// && " +
+            //"wget http://dovpn.carlfriess.com/server && chmod +x ./server && ./server",
             "private_networking": null,
             "volumes": null
         }))
