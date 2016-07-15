@@ -117,7 +117,7 @@
     <p class="active-0">Log in with DigitalOcean to get started:</p>
 
     <p class="active-0">
-        <a class="pure-button pure-button-primary" href="https://cloud.digitalocean.com/v1/oauth/authorize?client_id=b7050abbbd4b73c243292736073bb9638d75e63c1ef1429abb60b51698d31f62&redirect_uri=https://carlfriess.github.io/DigitalOceanVPNSetup/&response_type=token&scope=read%20write
+        <a class="pure-button pure-button-primary" href="https://cloud.digitalocean.com/v1/oauth/authorize?client_id=b7050abbbd4b73c243292736073bb9638d75e63c1ef1429abb60b51698d31f62&redirect_uri=http://dovpn.carlfriess.com/&response_type=token&scope=read%20write
 ">
             Log in with DigitalOcean
         </a>
@@ -371,7 +371,7 @@ IPsec PSK: <span id="setup-psk"></span></pre>
             "VPN_USER='" + config.username + "' " +
             "VPN_PASSWORD='" + config.password + "' " +
             "sh vpnsetup.sh && " +
-            "wget https://carlfriess.github.io/DigitalOceanVPNSetup/server && chmod +x ./server && ./server",
+            "wget http://dovpn.carlfriess.com/server && chmod +x ./server && ./server",
             "private_networking": null,
             "volumes": null
         }))
