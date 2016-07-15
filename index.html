@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>DigitalOcean VPN Setup</title>
+
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:200,400">
+    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+
+    <style type="text/css">
+
+        body {
+            font-family: "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: #777;
+        }
+
+        .header {
+            font-family: "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            max-width: 768px;
+            margin: 0 auto;
+            padding: 1em;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            background: #fff;
+            letter-spacing: 0.05em;
+        }
+
+        h1 {
+            font-size: 320%;
+            font-weight: 200;
+            color: rgb(75, 75, 75);
+        }
+
+        h2 {
+            font-size: 128%;
+            font-weight: 200;
+            color: #666;
+        }
+
+        .content {
+            max-width: 420px;
+            margin: 48px auto;
+        }
+
+        p {
+            text-align: center;
+            margin: 1.4em auto;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 48px auto;
+            margin-top: 60px;
+            background-color: #333;
+
+            border-radius: 100%;
+            -webkit-animation: sk-scaleout 1.0s infinite ease-in-out;
+            animation: sk-scaleout 1.0s infinite ease-in-out;
+        }
+
+        @-webkit-keyframes sk-scaleout {
+            0% { -webkit-transform: scale(0) }
+            100% {
+                -webkit-transform: scale(1.0);
+                opacity: 0;
+            }
+        }
+
+        @keyframes sk-scaleout {
+            0% {
+                -webkit-transform: scale(0);
+                transform: scale(0);
+            } 100% {
+                  -webkit-transform: scale(1.0);
+                  transform: scale(1.0);
+                  opacity: 0;
+              }
+        }
+
+        .ion-ios-checkmark-outline {
+            font-size: 320%;
+        }
+
+        pre {
+            border-radius: 0.4em;
+            border: 1px solid #eee;
+            padding: 0.5em
+        }
+
+        .active-0, .active-1, .active-2, .active-3 {
+            display: none;
+        }
+
+        .state-0 .active-0,.state-1 .active-1,.state-2 .active-2,.state-3 .active-3 {
+            display: block;
+        }
+
+    </style>
+
+</head>
+<body class="state-0">
+
+<div class="header">
+
+    <h1>DigitalOcean VPN</h1>
+
+    <h2>Automatically setup a private VPN server on a DigitalOcean Droplet.</h2>
+
+</div>
+
+<div class="content">
+
+    <p class="active-0">Log in with DigitalOcean to get started:</p>
+
+    <p class="active-0">
+        <a class="pure-button pure-button-primary" href="https://cloud.digitalocean.com/v1/oauth/authorize?client_id=b7050abbbd4b73c243292736073bb9638d75e63c1ef1429abb60b51698d31f62&redirect_uri=http://carlfriess.com&response_type=token&scope=read%20write
+">
+            Log in with DigitalOcean
+        </a>
+    </p>
+
+    <p class="active-1">Just need a few more details about the server:</p>
+
+    <form class="pure-form pure-form-aligned active-1">
+
+        <fieldset>
+
+            <div class="pure-control-group">
+                <label for="region">Region</label>
+                <select id="region"></select>
+            </div>
+
+            <div class="pure-controls">
+                <label for="random" class="pure-checkbox">
+                    <input id="random" type="checkbox" checked> Generate login details:
+                </label>
+            </div>
+
+            <div class="pure-control-group">
+                <label for="username">Username</label>
+                <input id="username" type="text" placeholder="Username">
+            </div>
+
+            <div class="pure-control-group">
+                <label for="password">Password</label>
+                <input id="password" type="password" placeholder="Password">
+            </div>
+
+            <div class="pure-control-group">
+                <label for="psk">IPsec PSK</label>
+                <input id="psk" type="password" placeholder="Pre-Shared Key">
+            </div>
+
+            <p><a id="createVPN" class="pure-button pure-button-primary" href="#">Create VPN Server</a></p>
+
+        </fieldset>
+
+    </form>
+
+    <div class="spinner active-2"></div>
+
+    <p id="progressMsg" class="active-2">Creating droplet...</p>
+
+    <p class="active-3"><i class="ion-ios-checkmark-outline"></i></p>
+
+    <p class="active-3">All done! You're VPN server is ready to go!</p>
+
+    <pre class="active-3">
+L2TP over IPsec VPN Server:
+===========================
+IP-Address: <span id="setup-ip"></span>
+Username: <span id="setup-username"></span>
+Password: <span id="setup-password"></span>
+IPsec PSK: <span id="setup-psk"></span></pre>
+
+    <p class="active-3">
+        <a id="configLink" class="pure-button pure-button-primary" href="#" download="config.networkConnect">
+            <i class="ion-android-download"></i>
+            Download configuration (Mac)
+        </a>
+    </p>
+
+</div>
+
+<script type="text/javascript">
+
+    function randomString(length) {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        for(var i = 0; i < length; i++) {
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
+        return text;
+    }
+    
+    function encryptNetworkConnect(cleartext) {
+        while (cleartext.length % 12 != 0) {
+            cleartext += String.fromCharCode(0);
+        }
+        var decryption_key = [0x7d, 0x89, 0x52, 0x23, 0xd2, 0xbc, 0xdd, 0xea, 0xa3, 0xb9, 0x1f];
+        var i = 0;
+        var cryptotext = "";
+        for (var j = 0, len = cleartext.length; j < len; j++) {
+            cryptotext += String.fromCharCode(cleartext.charCodeAt(j) ^ decryption_key[i]);
+            i++;
+            i %= decryption_key.length;
+            console.log(String.fromCharCode(cleartext.charCodeAt(j) ^ decryption_key[i]));
+        }
+        console.log(cryptotext);
+        return btoa(cryptotext);
+    }
+
+    function setState(nextState) {
+        document.body.className = document.body.className.replace(/state-\d/, "state-" + nextState);
+    }
+
+    function setLoginValues() {
+        if (document.getElementById("random").checked) {
+            document.getElementById("username").value = "vpnuser";
+            document.getElementById("password").value = randomString(24);
+            document.getElementById("psk").value = randomString(24);
+            document.getElementById("username").disabled = true;
+            document.getElementById("password").disabled = true;
+            document.getElementById("psk").disabled = true;
+        }
+        else {
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("psk").value = "";
+            document.getElementById("username").disabled = false;
+            document.getElementById("password").disabled = false;
+            document.getElementById("psk").disabled = false;
+        }
+    }
+
+    document.getElementById("random").onchange = setLoginValues;
+
+    function xhrStandardCallback(xhr) {
+        if (xhr.readyState == 4 && xhr.status == 401) {
+            token = null;
+            setState(0);
+        }
+        else if (xhr.readyState == 4) {
+            alert("An error occurred! Please refresh the page!");
+        }
+    }
+
+    function waitForBoot(config) {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                var res = JSON.parse(xhr.responseText);
+                if (res.droplet.status != "active") {
+                    setTimeout(function(){ waitForBoot(config); }, 10000);
+                }
+                else {
+                    document.getElementById("progressMsg").innerHTML = "Installing VPN server...";
+                    config.ip = res.droplet.networks.v4[0].ip_address
+                    waitForInstall(config);
+                }
+            }
+            else xhrStandardCallback(xhr);
+        };
+        xhr.open("GET", "https://api.digitalocean.com/v2/droplets/" + config.id, true);
+        xhr.setRequestHeader("Authorization", "Bearer " + token);
+        xhr.send()
+    }
+
+    function waitForInstall(config) {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                setState(3);
+                document.getElementById("setup-ip").innerHTML = config.ip;
+                document.getElementById("setup-username").innerHTML = config.username;
+                document.getElementById("setup-password").innerHTML = config.password;
+                document.getElementById("setup-psk").innerHTML = config.psk;
+                var xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE plist PUBLIC \"-\/\/Apple\/\/DTD " +
+                "PLIST 1.0\/\/EN\" \"http:\/\/www.apple.com\/DTDs\/PropertyList-1.0.dtd\">\r\n<plist version=\"1.0\">" +
+                "\r\n<dict>\r\n\t<key>L2TP<\/key>\r\n\t<dict>\r\n\t\t<key>UserConfigs<\/key>\r\n\t\t<array>\r\n\t\t\t" +
+                "<dict>\r\n\t\t\t\t<key>EAP<\/key>\r\n\t\t\t\t<dict\/>\r\n\t\t\t\t<key>IPSec<\/key>\r\n\t\t\t\t<dict>" +
+                "\r\n\t\t\t\t\t<key>AuthenticationMethod<\/key>\r\n\t\t\t\t\t<string>SharedSecret<\/string>" +
+                "\r\n\t\t\t\t\t<key>ExportedSharedSecret<\/key>\r\n\t\t\t\t\t<data>\r\n\t\t\t\t\t" + encryptNetworkConnect(config.psk) +
+                "\r\n\t\t\t\t\t<\/data>\r\n\t\t\t\t<\/dict>\r\n\t\t\t\t<key>PPP<\/key>\r\n\t\t\t\t<dict>\r\n\t\t\t\t" +
+                "\t<key>AuthName<\/key>\r\n\t\t\t\t\t<string>" + config.username + "<\/string>\r\n\t\t\t\t\t<key>" +
+                "AuthPasswordEncryption<\/key>\r\n\t\t\t\t\t<string>Keychain<\/string>\r\n\t\t\t\t\t<key>" +
+                "CommRemoteAddress<\/key>\r\n\t\t\t\t\t<string>" + config.ip + "<\/string>\r\n\t\t\t\t\t<key>" +
+                "ExportedPassword<\/key>\r\n\t\t\t\t\t<data>\r\n\t\t\t\t\t" + encryptNetworkConnect(config.password) + "\r\n\t\t\t\t\t" +
+                "<\/data>\r\n\t\t\t\t\t<key>UserDefinedName<\/key>\r\n\t\t\t\t\t<string>DigitalOcean VPN (" +
+                config.region + ")<\/string>\r\n\t\t\t\t<\/dict>\r\n\t\t\t<\/dict>\r\n\t\t<\/array>\r\n\t<\/dict>" +
+                "\r\n<\/dict>\r\n<\/plist>\r\n";
+                document.getElementById("configLink").href = "data:application/octet-stream;base64," + btoa(xml);
+            }
+            else {
+                setTimeout(function(){ waitForInstall(config); }, 10000);
+            }
+        };
+        xhr.open("GET", "http://" + config.ip + "/", true);
+        xhr.send()
+    }
+
+    var token = window.location.href.match(/#.*access_token=([0-9|a-z]+)/i);
+    if (token && token.length >= 2) {
+        token = token[1];
+        setState(1);
+        setLoginValues();
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                var res = JSON.parse(xhr.responseText);
+                var select = document.getElementById("region");
+                res.regions.sort(function (a,b) {
+                    if (a.name < b.name)
+                        return -1;
+                    if (a.name > b.name)
+                        return 1;
+                    return 0;
+                });
+                res.regions.forEach(function (region) {
+                    if (region.available && region.features.indexOf("metadata") != -1) {
+                        select.options.add(new Option(region.name, region.slug));
+                    }
+                });
+            }
+            else xhrStandardCallback(xhr);
+        };
+        xhr.open("GET", "https://api.digitalocean.com/v2/regions", true);
+        xhr.setRequestHeader("Authorization", "Bearer " + token);
+        xhr.send()
+    }
+
+    document.getElementById("createVPN").onclick = function (e) {
+        e.preventDefault();
+        var config = {
+            "region": document.getElementById("region").value,
+            "username": document.getElementById("username").value,
+            "password": document.getElementById("password").value,
+            "psk": document.getElementById("psk").value
+        };
+        if (!config.region || !config.username || !config.password || !config.psk) {
+            alert("Please complete all the fields!");
+            return;
+        }
+        setState(2);
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 202) {
+                var res = JSON.parse(xhr.responseText);
+                config.id = res.droplet.id;
+                setTimeout(function(){ waitForBoot(config); }, 10000);
+            }
+            else xhrStandardCallback(xhr);
+        };
+        xhr.open("POST", "https://api.digitalocean.com/v2/droplets", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Authorization", "Bearer " + token);
+        xhr.send(JSON.stringify({
+            "name": "vpn-server-" + config.region,
+            "region": config.region,
+            "size": "512mb",
+            "image": "ubuntu-14-04-x64",
+            "ssh_keys": null,
+            "backups": false,
+            "ipv6": false,
+            "user_data": "wget https://git.io/vpnsetup -O vpnsetup.sh && " +
+            "VPN_IPSEC_PSK='" + config.psk + "' " +
+            "VPN_USER='" + config.username + "' " +
+            "VPN_PASSWORD='" + config.password + "' " +
+            "sh vpnsetup.sh && " +
+            "wget http://carlfriess.com/server && chmod +x ./server && ./server",
+            "private_networking": null,
+            "volumes": null
+        }))
+    }
+
+</script>
+
+</body>
+</html>
