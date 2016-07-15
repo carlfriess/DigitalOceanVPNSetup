@@ -257,7 +257,7 @@ IPsec PSK: <span id="setup-psk"></span></pre>
                 }
                 else {
                     document.getElementById("progressMsg").innerHTML = "Installing VPN server...";
-                    config.ip = res.droplet.networks.v4[0].ip_address;
+                    config.ip = res.droplet.networks.v6[0].ip_address;
                     waitForInstall(config);
                 }
             }
@@ -364,7 +364,7 @@ IPsec PSK: <span id="setup-psk"></span></pre>
             "image": "ubuntu-14-04-x64",
             "ssh_keys": null,
             "backups": false,
-            "ipv6": false,
+            "ipv6": true,
             "user_data": "#!/bin/bash\n\n" +
             "wget https://git.io/vpnsetup -O vpnsetup.sh && " +
             "VPN_IPSEC_PSK='" + config.psk + "' " +
