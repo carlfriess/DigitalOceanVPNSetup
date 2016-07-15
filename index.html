@@ -208,9 +208,7 @@ IPsec PSK: <span id="setup-psk"></span></pre>
             cryptotext += String.fromCharCode(cleartext.charCodeAt(j) ^ decryption_key[i]);
             i++;
             i %= decryption_key.length;
-            console.log(String.fromCharCode(cleartext.charCodeAt(j) ^ decryption_key[i]));
         }
-        console.log(cryptotext);
         return btoa(cryptotext);
     }
 
@@ -295,7 +293,8 @@ IPsec PSK: <span id="setup-psk"></span></pre>
                 "\r\n<\/dict>\r\n<\/plist>\r\n";
                 document.getElementById("configLink").href = "data:application/octet-stream;base64," + btoa(xml);
             }
-            else {
+            else if (xhr.readyState == 4) {
+                xhr.abort();
                 setTimeout(function(){ waitForInstall(config); }, 10000);
             }
         };
