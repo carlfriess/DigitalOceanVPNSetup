@@ -54,8 +54,7 @@
         .spinner {
             width: 40px;
             height: 40px;
-            margin: 48px auto;
-            margin-top: 60px;
+            margin: 60px auto 48px;
             background-color: #333;
 
             border-radius: 100%;
@@ -260,7 +259,7 @@ IPsec PSK: <span id="setup-psk"></span></pre>
                 }
                 else {
                     document.getElementById("progressMsg").innerHTML = "Installing VPN server...";
-                    config.ip = res.droplet.networks.v4[0].ip_address
+                    config.ip = res.droplet.networks.v4[0].ip_address;
                     waitForInstall(config);
                 }
             }
