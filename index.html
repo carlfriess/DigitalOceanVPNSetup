@@ -7,9 +7,9 @@
 
     <title>DigitalOcean VPN Setup</title>
 
-    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/pure/0.6.0/pure-min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:200,400">
-    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
 
     <style type="text/css">
 
@@ -118,7 +118,7 @@
     <p class="active-0">Log in with DigitalOcean to get started:</p>
 
     <p class="active-0">
-        <a class="pure-button pure-button-primary" href="https://cloud.digitalocean.com/v1/oauth/authorize?client_id=b7050abbbd4b73c243292736073bb9638d75e63c1ef1429abb60b51698d31f62&redirect_uri=http://carlfriess.com&response_type=token&scope=read%20write
+        <a class="pure-button pure-button-primary" href="https://cloud.digitalocean.com/v1/oauth/authorize?client_id=b7050abbbd4b73c243292736073bb9638d75e63c1ef1429abb60b51698d31f62&redirect_uri=https://carlfriess.github.io/DigitalOceanVPNSetup/&response_type=token&scope=read%20write
 ">
             Log in with DigitalOcean
         </a>
@@ -372,7 +372,7 @@ IPsec PSK: <span id="setup-psk"></span></pre>
             "VPN_USER='" + config.username + "' " +
             "VPN_PASSWORD='" + config.password + "' " +
             "sh vpnsetup.sh && " +
-            "wget http://carlfriess.com/server && chmod +x ./server && ./server",
+            "wget https://carlfriess.github.io/DigitalOceanVPNSetup/server && chmod +x ./server && ./server",
             "private_networking": null,
             "volumes": null
         }))
