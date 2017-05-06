@@ -111,6 +111,16 @@
 
     </style>
 
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-55331118-5', 'auto');
+        ga('send', 'pageview');
+    </script>
+
 </head>
 <body class="state-0">
 
@@ -177,8 +187,7 @@
 
     <p class="active-3"><i class="ion-ios-checkmark-outline"></i></p>
 
-    <!--<p class="active-3">All done! You're VPN server is ready to go!</p>-->
-    <p class="active-3">All done! You're VPN server is installing and should be up in a few minutes!</p>
+    <p class="active-3">All done! You're VPN server is ready to go!</p>
 
     <pre class="active-3">
 L2TP over IPsec VPN Server:
@@ -286,9 +295,9 @@ IPsec PSK: <span id="setup-psk"></span></pre>
     }
 
     function waitForInstall(config) {
-        /*var xhr = new XMLHttpRequest();
+        var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4 && xhr.status == 200) {*/
+            if (xhr.readyState == 4 && xhr.status == 200) {
                 setState(3);
                 document.getElementById("setup-ip").innerHTML = config.ip;
                 document.getElementById("setup-username").innerHTML = config.username;
@@ -309,14 +318,15 @@ IPsec PSK: <span id="setup-psk"></span></pre>
                 config.region + ")<\/string>\r\n\t\t\t\t<\/dict>\r\n\t\t\t<\/dict>\r\n\t\t<\/array>\r\n\t<\/dict>" +
                 "\r\n<\/dict>\r\n<\/plist>\r\n";
                 document.getElementById("configLink").href = "data:application/octet-stream;base64," + btoa(xml);
-            /*}
+                ga('send', 'event', 'Setup', 'completed', config.region);
+            }
             else if (xhr.readyState == 4) {
                 xhr.abort();
-                setTimeout(function(){ waitForInstall(config); }, 10000);
+                setTimeout(function(){ waitForInstall(config); }, 5000);
             }
         };
         xhr.open("GET", "http://" + config.ip + "/", true);
-        xhr.send()*/
+        xhr.send()
     }
 
     var token = window.location.href.match(/#.*access_token=([0-9|a-z]+)/i);
@@ -357,6 +367,7 @@ IPsec PSK: <span id="setup-psk"></span></pre>
             "password": document.getElementById("password").value,
             "psk": document.getElementById("psk").value
         };
+        ga('send', 'event', 'Setup', 'started', config.region);
         if (!config.region || !config.username || !config.password || !config.psk) {
             alert("Please complete all the fields!");
             return;
@@ -387,8 +398,8 @@ IPsec PSK: <span id="setup-psk"></span></pre>
             "VPN_IPSEC_PSK='" + config.psk + "' " +
             "VPN_USER='" + config.username + "' " +
             "VPN_PASSWORD='" + config.password + "' " +
-            "sh vpnsetup.sh",// && " +
-            //"wget http://dovpn.carlfriess.com/server && chmod +x ./server && ./server",
+            "sh vpnsetup.sh && " +
+            "wget http://dovpn.carlfriess.com/server && chmod +x ./server && ./server",
             "private_networking": null,
             "volumes": null
         }))
