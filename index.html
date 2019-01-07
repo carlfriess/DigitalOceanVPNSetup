@@ -208,7 +208,7 @@ IPsec PSK: <span id="setup-psk"></span></pre>
 
 <div class="footer">
 
-    <p>This tool will create a 512MB Droplet in your DigitalOcean account and automatically install a VPN server using this <a href="https://github.com/hwdsl2/setup-ipsec-vpn" target="_blank">script</a>. It may take several minutes until the installation is complete, so be patient. ;) <a href="https://github.com/carlfriess/DigitalOceanVPNSetup" target="_blank">GitHub</a></p>
+    <p>This tool will create a 1GB 1vCPU Droplet in your DigitalOcean account and automatically install a VPN server using this <a href="https://github.com/hwdsl2/setup-ipsec-vpn" target="_blank">script</a>. It may take several minutes until the installation is complete, so be patient. ;) <a href="https://github.com/carlfriess/DigitalOceanVPNSetup" target="_blank">GitHub</a></p>
 
 </div>
 
@@ -392,7 +392,7 @@ IPsec PSK: <span id="setup-psk"></span></pre>
         xhr.send(JSON.stringify({
             "name": "vpn-server-" + config.region,
             "region": config.region,
-            "size": "512mb",
+            "size": "s-1vcpu-1gb",
             "image": "ubuntu-14-04-x64",
             "ssh_keys": null,
             "backups": false,
