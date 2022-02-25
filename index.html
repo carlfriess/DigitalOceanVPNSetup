@@ -274,12 +274,17 @@ IPsec PSK: <span id="setup-psk"></span></pre>
     document.getElementById("random").onchange = setLoginValues;
 
     function xhrStandardCallback(xhr) {
-        if (xhr.readyState == 4 && xhr.status == 401) {
+        if (xhr.readyState === 4 && xhr.status === 401) {
             token = null;
             setState(0);
         }
-        else if (xhr.readyState == 4) {
-            alert("An error occurred! Please refresh the page!");
+        else if (xhr.readyState === 4) {
+            try {
+                const res = JSON.parse(xhr.responseText);
+                alert(`An error occurred! Please refresh the page!\n\n${ res.message }\n(${ res.id })`);
+            } catch (e) {
+                alert("An error occurred! Please refresh the page!");
+            }
         }
     }
 
