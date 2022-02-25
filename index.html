@@ -61,6 +61,10 @@
             margin: 1.4em auto;
         }
 
+        input[type=text], input[type=password], select {
+            width: 220px;
+        }
+
         .spinner {
             width: 40px;
             height: 40px;
@@ -107,6 +111,13 @@
 
         .state-0 .active-0,.state-1 .active-1,.state-2 .active-2,.state-3 .active-3 {
             display: block;
+        }
+
+        @media only screen and (max-width: 480px) {
+            form {
+                width: 220px;
+                margin: 0 auto;
+            }
         }
 
     </style>
