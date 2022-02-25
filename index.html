@@ -203,7 +203,7 @@
 
     <p class="active-3"><i class="ion-ios-checkmark-outline"></i></p>
 
-    <p class="active-3">All done! You're VPN server is ready to go!</p>
+    <p class="active-3">All done! Your VPN server is ready to go!</p>
 
     <pre class="active-3">
 L2TP over IPsec VPN Server:
@@ -356,13 +356,11 @@ IPsec PSK: <span id="setup-psk"></span></pre>
                     "\r\n<dict>\r\n\t<key>L2TP<\/key>\r\n\t<dict>\r\n\t\t<key>UserConfigs<\/key>\r\n\t\t<array>\r\n\t\t\t" +
                     "<dict>\r\n\t\t\t\t<key>EAP<\/key>\r\n\t\t\t\t<dict\/>\r\n\t\t\t\t<key>IPSec<\/key>\r\n\t\t\t\t<dict>" +
                     "\r\n\t\t\t\t\t<key>AuthenticationMethod<\/key>\r\n\t\t\t\t\t<string>SharedSecret<\/string>" +
-                    "\r\n\t\t\t\t\t<key>ExportedSharedSecret<\/key>\r\n\t\t\t\t\t<data>\r\n\t\t\t\t\t" + encryptNetworkConnect(config.psk) +
-                    "\r\n\t\t\t\t\t<\/data>\r\n\t\t\t\t<\/dict>\r\n\t\t\t\t<key>PPP<\/key>\r\n\t\t\t\t<dict>\r\n\t\t\t\t" +
+                    "\r\n\t\t\t\t<\/dict>\r\n\t\t\t\t<key>PPP<\/key>\r\n\t\t\t\t<dict>\r\n\t\t\t\t" +
                     "\t<key>AuthName<\/key>\r\n\t\t\t\t\t<string>" + config.username + "<\/string>\r\n\t\t\t\t\t<key>" +
                     "AuthPasswordEncryption<\/key>\r\n\t\t\t\t\t<string>Keychain<\/string>\r\n\t\t\t\t\t<key>" +
-                    "CommRemoteAddress<\/key>\r\n\t\t\t\t\t<string>" + config.ip + "<\/string>\r\n\t\t\t\t\t<key>" +
-                    "ExportedPassword<\/key>\r\n\t\t\t\t\t<data>\r\n\t\t\t\t\t" + encryptNetworkConnect(config.password) + "\r\n\t\t\t\t\t" +
-                    "<\/data>\r\n\t\t\t\t\t<key>UserDefinedName<\/key>\r\n\t\t\t\t\t<string>DigitalOcean VPN (" +
+                    "CommRemoteAddress<\/key>\r\n\t\t\t\t\t<string>" + config.ip + "<\/string>\r\n" +
+                    "\t\t\t\t\t<key>UserDefinedName<\/key>\r\n\t\t\t\t\t<string>DigitalOcean VPN (" +
                     config.region + ")<\/string>\r\n\t\t\t\t<\/dict>\r\n\t\t\t<\/dict>\r\n\t\t<\/array>\r\n\t<\/dict>" +
                     "\r\n<\/dict>\r\n<\/plist>\r\n";
                 document.getElementById("config-link").href = "data:application/octet-stream;base64," + btoa(xml);
