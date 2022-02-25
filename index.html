@@ -231,7 +231,9 @@ IPsec PSK: <span id="setup-psk"></span></pre>
 
 <script type="text/javascript">
 
-	if (location.protocol == 'https:') {
+    let token;
+
+	if (location.protocol === "https:") {
 		location.href = "http://dovpn.carlfriess.com";
 	}
 
@@ -300,11 +302,11 @@ IPsec PSK: <span id="setup-psk"></span></pre>
     }
 
     function waitForBoot(config) {
-        var xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4 && xhr.status == 200) {
-                var res = JSON.parse(xhr.responseText);
-                if (res.droplet.status != "active") {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                const res = JSON.parse(xhr.responseText);
+                if (res.droplet.status !== "active") {
                     setTimeout(function(){ waitForBoot(config); }, 10000);
                 }
                 else {
@@ -321,9 +323,9 @@ IPsec PSK: <span id="setup-psk"></span></pre>
     }
 
     function waitForInstall(config) {
-        var xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4 && xhr.status == 200) {
+            if (xhr.readyState === 4 && xhr.status === 200) {
                 setState(3);
                 document.getElementById("setup-ip").innerHTML = config.ip;
                 document.getElementById("setup-username").innerHTML = config.username;
@@ -346,7 +348,7 @@ IPsec PSK: <span id="setup-psk"></span></pre>
                 document.getElementById("configLink").href = "data:application/octet-stream;base64," + btoa(xml);
                 ga('send', 'event', 'Setup', 'completed', config.region);
             }
-            else if (xhr.readyState == 4) {
+            else if (xhr.readyState === 4) {
                 xhr.abort();
                 setTimeout(function(){ waitForInstall(config); }, 5000);
             }
@@ -355,16 +357,16 @@ IPsec PSK: <span id="setup-psk"></span></pre>
         xhr.send()
     }
 
-    var token = window.location.href.match(/#.*access_token=([0-9|a-z]+)/i);
+    token = window.location.href.match(/#.*access_token=([0-9|a-z]+)/i);
     if (token && token.length >= 2) {
         token = token[1];
         setState(1);
         setLoginValues();
-        var xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4 && xhr.status == 200) {
-                var res = JSON.parse(xhr.responseText);
-                var select = document.getElementById("region");
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                const res = JSON.parse(xhr.responseText);
+                const select = document.getElementById("region");
                 res.regions.sort(function (a,b) {
                     if (a.name < b.name)
                         return -1;
@@ -373,7 +375,9 @@ IPsec PSK: <span id="setup-psk"></span></pre>
                     return 0;
                 });
                 res.regions.forEach(function (region) {
-                    if (region.available && region.features.indexOf("metadata") != -1) {
+                    if (region.available &&
+                        region.features.indexOf("metadata") !== -1 &&
+                        region.sizes.indexOf("s-1vcpu-1gb") !== -1) {
                         select.options.add(new Option(region.name, region.slug));
                     }
                 });
@@ -387,22 +391,22 @@ IPsec PSK: <span id="setup-psk"></span></pre>
 
     document.getElementById("createVPN").onclick = function (e) {
         e.preventDefault();
-        var config = {
+        const config = {
             "region": document.getElementById("region").value,
             "username": document.getElementById("username").value,
             "password": document.getElementById("password").value,
             "psk": document.getElementById("psk").value
         };
-        ga('send', 'event', 'Setup', 'started', config.region);
         if (!config.region || !config.username || !config.password || !config.psk) {
             alert("Please complete all the fields!");
             return;
         }
+        ga('send', 'event', 'Setup', 'started', config.region);
         setState(2);
-        var xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4 && xhr.status == 202) {
-                var res = JSON.parse(xhr.responseText);
+            if (xhr.readyState === 4 && xhr.status === 202) {
+                const res = JSON.parse(xhr.responseText);
                 config.id = res.droplet.id;
                 setTimeout(function(){ waitForBoot(config); }, 10000);
             }
