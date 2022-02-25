@@ -118,6 +118,11 @@
                 width: 220px;
                 margin: 0 auto;
             }
+
+            pre {
+                margin-left: 1em;
+                margin-right: 1em;
+            }
         }
 
     </style>
@@ -195,6 +200,8 @@
     <div class="spinner active-2"></div>
 
     <p id="progressMsg" class="active-2">Creating droplet...</p>
+
+    <pre id="log" class="active-2 hidden"></pre>
 
     <p class="active-3"><i class="ion-ios-checkmark-outline"></i></p>
 
@@ -307,10 +314,10 @@ IPsec PSK: <span id="setup-psk"></span></pre>
             if (xhr.readyState === 4 && xhr.status === 200) {
                 const res = JSON.parse(xhr.responseText);
                 if (res.droplet.status !== "active") {
-                    setTimeout(function(){ waitForBoot(config); }, 10000);
+                    setTimeout(() => waitForBoot(config), 5000);
                 }
                 else {
-                    document.getElementById("progressMsg").innerHTML = "Installing VPN server...";
+                    document.getElementById("progressMsg").innerHTML = "Waiting for droplet...";
                     config.ip = res.droplet.networks.v4[0].ip_address;
                     waitForInstall(config);
                 }
@@ -323,38 +330,49 @@ IPsec PSK: <span id="setup-psk"></span></pre>
     }
 
     function waitForInstall(config) {
-        const xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
+        let connected = false;
+        let done = false;
+        const ws = new WebSocket(`ws://${config.ip}/`);
+        ws.onopen = () => {
+            connected = true;
+            document.getElementById("progressMsg").innerHTML = "Installing VPN server...";
+            document.getElementById("log").classList.remove("hidden");
+        };
+        ws.onclose = () => {
+            if (!connected) {
+                setTimeout(() => waitForInstall(config), 5000);
+            } else if (!done) {
+                alert("An error occurred configuring the VPN server! Please check the log.");
+            }
+        };
+        ws.onmessage = (e) => {
+            if (e.data === "<DONE>") {
+                done = true;
                 setState(3);
                 document.getElementById("setup-ip").innerHTML = config.ip;
                 document.getElementById("setup-username").innerHTML = config.username;
                 document.getElementById("setup-password").innerHTML = config.password;
                 document.getElementById("setup-psk").innerHTML = config.psk;
-                var xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE plist PUBLIC \"-\/\/Apple\/\/DTD " +
-                "PLIST 1.0\/\/EN\" \"http:\/\/www.apple.com\/DTDs\/PropertyList-1.0.dtd\">\r\n<plist version=\"1.0\">" +
-                "\r\n<dict>\r\n\t<key>L2TP<\/key>\r\n\t<dict>\r\n\t\t<key>UserConfigs<\/key>\r\n\t\t<array>\r\n\t\t\t" +
-                "<dict>\r\n\t\t\t\t<key>EAP<\/key>\r\n\t\t\t\t<dict\/>\r\n\t\t\t\t<key>IPSec<\/key>\r\n\t\t\t\t<dict>" +
-                "\r\n\t\t\t\t\t<key>AuthenticationMethod<\/key>\r\n\t\t\t\t\t<string>SharedSecret<\/string>" +
-                "\r\n\t\t\t\t\t<key>ExportedSharedSecret<\/key>\r\n\t\t\t\t\t<data>\r\n\t\t\t\t\t" + encryptNetworkConnect(config.psk) +
-                "\r\n\t\t\t\t\t<\/data>\r\n\t\t\t\t<\/dict>\r\n\t\t\t\t<key>PPP<\/key>\r\n\t\t\t\t<dict>\r\n\t\t\t\t" +
-                "\t<key>AuthName<\/key>\r\n\t\t\t\t\t<string>" + config.username + "<\/string>\r\n\t\t\t\t\t<key>" +
-                "AuthPasswordEncryption<\/key>\r\n\t\t\t\t\t<string>Keychain<\/string>\r\n\t\t\t\t\t<key>" +
-                "CommRemoteAddress<\/key>\r\n\t\t\t\t\t<string>" + config.ip + "<\/string>\r\n\t\t\t\t\t<key>" +
-                "ExportedPassword<\/key>\r\n\t\t\t\t\t<data>\r\n\t\t\t\t\t" + encryptNetworkConnect(config.password) + "\r\n\t\t\t\t\t" +
-                "<\/data>\r\n\t\t\t\t\t<key>UserDefinedName<\/key>\r\n\t\t\t\t\t<string>DigitalOcean VPN (" +
-                config.region + ")<\/string>\r\n\t\t\t\t<\/dict>\r\n\t\t\t<\/dict>\r\n\t\t<\/array>\r\n\t<\/dict>" +
-                "\r\n<\/dict>\r\n<\/plist>\r\n";
+                const xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE plist PUBLIC \"-\/\/Apple\/\/DTD " +
+                    "PLIST 1.0\/\/EN\" \"http:\/\/www.apple.com\/DTDs\/PropertyList-1.0.dtd\">\r\n<plist version=\"1.0\">" +
+                    "\r\n<dict>\r\n\t<key>L2TP<\/key>\r\n\t<dict>\r\n\t\t<key>UserConfigs<\/key>\r\n\t\t<array>\r\n\t\t\t" +
+                    "<dict>\r\n\t\t\t\t<key>EAP<\/key>\r\n\t\t\t\t<dict\/>\r\n\t\t\t\t<key>IPSec<\/key>\r\n\t\t\t\t<dict>" +
+                    "\r\n\t\t\t\t\t<key>AuthenticationMethod<\/key>\r\n\t\t\t\t\t<string>SharedSecret<\/string>" +
+                    "\r\n\t\t\t\t\t<key>ExportedSharedSecret<\/key>\r\n\t\t\t\t\t<data>\r\n\t\t\t\t\t" + encryptNetworkConnect(config.psk) +
+                    "\r\n\t\t\t\t\t<\/data>\r\n\t\t\t\t<\/dict>\r\n\t\t\t\t<key>PPP<\/key>\r\n\t\t\t\t<dict>\r\n\t\t\t\t" +
+                    "\t<key>AuthName<\/key>\r\n\t\t\t\t\t<string>" + config.username + "<\/string>\r\n\t\t\t\t\t<key>" +
+                    "AuthPasswordEncryption<\/key>\r\n\t\t\t\t\t<string>Keychain<\/string>\r\n\t\t\t\t\t<key>" +
+                    "CommRemoteAddress<\/key>\r\n\t\t\t\t\t<string>" + config.ip + "<\/string>\r\n\t\t\t\t\t<key>" +
+                    "ExportedPassword<\/key>\r\n\t\t\t\t\t<data>\r\n\t\t\t\t\t" + encryptNetworkConnect(config.password) + "\r\n\t\t\t\t\t" +
+                    "<\/data>\r\n\t\t\t\t\t<key>UserDefinedName<\/key>\r\n\t\t\t\t\t<string>DigitalOcean VPN (" +
+                    config.region + ")<\/string>\r\n\t\t\t\t<\/dict>\r\n\t\t\t<\/dict>\r\n\t\t<\/array>\r\n\t<\/dict>" +
+                    "\r\n<\/dict>\r\n<\/plist>\r\n";
                 document.getElementById("configLink").href = "data:application/octet-stream;base64," + btoa(xml);
                 ga('send', 'event', 'Setup', 'completed', config.region);
-            }
-            else if (xhr.readyState === 4) {
-                xhr.abort();
-                setTimeout(function(){ waitForInstall(config); }, 5000);
+            } else {
+                document.getElementById('log').textContent += `${ e.data }\n`;
             }
         };
-        xhr.open("GET", "http://" + config.ip + "/", true);
-        xhr.send()
     }
 
     token = window.location.href.match(/#.*access_token=([0-9|a-z]+)/i);
@@ -424,12 +442,22 @@ IPsec PSK: <span id="setup-psk"></span></pre>
             "backups": false,
             "ipv6": false,
             "user_data": "#!/bin/bash\n\n" +
-            "wget https://git.io/vpnstart -qO vpn.sh && " +
-            "VPN_IPSEC_PSK='" + config.psk + "' " +
-            "VPN_USER='" + config.username + "' " +
-            "VPN_PASSWORD='" + config.password + "' " +
-            "sh vpn.sh && " +
-            "wget http://dovpn.carlfriess.com/server && chmod +x ./server && ./server",
+                "wget https://github.com/joewalnes/websocketd/releases/download/v0.4.1/websocketd-0.4.1-linux_amd64.zip\n" +
+                "apt install unzip\n" +
+                "unzip websocketd-0.4.1-linux_amd64.zip\n" +
+                "cat > ./install.sh << EOF\n" +
+                "#!/bin/bash\n\n" +
+                "wget https://git.io/vpnstart -qO vpn.sh && " +
+                "VPN_IPSEC_PSK='" + config.psk + "' " +
+                "VPN_USER='" + config.username + "' " +
+                "VPN_PASSWORD='" + config.password + "' " +
+                "sh vpn.sh 2>&1 && " +
+                "echo '<DONE>'\n" +
+                "killall websocketd\n" +
+                "EOF\n" +
+                "chmod +x install.sh\n" +
+                "./websocketd --port=80 ./install.sh\n" +
+                "rm install.sh\n",
             "private_networking": null,
             "volumes": null
         }));
