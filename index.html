@@ -246,12 +246,9 @@ IPsec PSK: <span id="setup-psk"></span></pre>
 	}
 
     function randomString(length) {
-        var text = "";
-        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        for(var i = 0; i < length; i++) {
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        }
-        return text;
+        const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        const randoms = crypto.getRandomValues(new Uint8Array(length));
+        return [].slice.call(randoms).map(v => possible.charAt(v % possible.length)).join("");
     }
     
     function encryptNetworkConnect(cleartext) {
