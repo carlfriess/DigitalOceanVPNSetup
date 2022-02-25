@@ -451,7 +451,9 @@ IPsec PSK: <span id="setup-psk"></span></pre>
                 "VPN_IPSEC_PSK='" + config.psk + "' " +
                 "VPN_USER='" + config.username + "' " +
                 "VPN_PASSWORD='" + config.password + "' " +
-                "sh vpn.sh 2>&1 && " +
+                "sh vpn.sh 2>&1 " +
+                "| sed -u 's/" + config.psk + "/*****/' " +
+                "| sed -u 's/" + config.password + "/*****/' && " +
                 "echo '<DONE>'\n" +
                 "killall websocketd\n" +
                 "EOF\n" +
