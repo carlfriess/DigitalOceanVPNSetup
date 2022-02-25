@@ -191,7 +191,7 @@
                 <input id="psk" type="password" placeholder="Pre-Shared Key">
             </div>
 
-            <p><a id="createVPN" class="pure-button pure-button-primary" href="#">Create VPN Server</a></p>
+            <p><a id="create-vpn" class="pure-button pure-button-primary" href="#">Create VPN Server</a></p>
 
         </fieldset>
 
@@ -200,8 +200,6 @@
     <div class="spinner active-2"></div>
 
     <p id="progressMsg" class="active-2">Creating droplet...</p>
-
-    <pre id="log" class="active-2 hidden"></pre>
 
     <p class="active-3"><i class="ion-ios-checkmark-outline"></i></p>
 
@@ -216,11 +214,14 @@ Password: <span id="setup-password"></span>
 IPsec PSK: <span id="setup-psk"></span></pre>
 
     <p class="active-3">
-        <a id="configLink" class="pure-button pure-button-primary" href="#" download="config.networkConnect">
+        <button id="show-logs" class="pure-button">Show Logs</button>
+        <a id="config-link" class="pure-button pure-button-primary" href="#" download="config.networkConnect">
             <i class="ion-android-download"></i>
             Download configuration (Mac)
         </a>
     </p>
+
+    <pre id="log" class="active-2 hidden"></pre>
 
 </div>
 
@@ -367,7 +368,7 @@ IPsec PSK: <span id="setup-psk"></span></pre>
                     "<\/data>\r\n\t\t\t\t\t<key>UserDefinedName<\/key>\r\n\t\t\t\t\t<string>DigitalOcean VPN (" +
                     config.region + ")<\/string>\r\n\t\t\t\t<\/dict>\r\n\t\t\t<\/dict>\r\n\t\t<\/array>\r\n\t<\/dict>" +
                     "\r\n<\/dict>\r\n<\/plist>\r\n";
-                document.getElementById("configLink").href = "data:application/octet-stream;base64," + btoa(xml);
+                document.getElementById("config-link").href = "data:application/octet-stream;base64," + btoa(xml);
                 ga('send', 'event', 'Setup', 'completed', config.region);
             } else {
                 document.getElementById('log').textContent += `${ e.data }\n`;
@@ -407,7 +408,7 @@ IPsec PSK: <span id="setup-psk"></span></pre>
         xhr.send()
     }
 
-    document.getElementById("createVPN").onclick = function (e) {
+    document.getElementById("create-vpn").onclick = (e) => {
         e.preventDefault();
         const config = {
             "region": document.getElementById("region").value,
@@ -463,6 +464,12 @@ IPsec PSK: <span id="setup-psk"></span></pre>
             "private_networking": null,
             "volumes": null
         }));
+    }
+
+    document.getElementById("show-logs").onclick = (e) => {
+        e.preventDefault();
+        document.getElementById("log").classList.add("active-3");
+        document.getElementById("show-logs").classList.add("hidden");
     }
 
 </script>
