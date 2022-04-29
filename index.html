@@ -371,7 +371,7 @@ IPsec PSK: <span id="setup-psk"></span></pre>
         };
     }
 
-    token = window.location.href.match(/#.*access_token=([0-9|a-z]+)/i);
+    token = window.location.href.match(/#.*access_token=([0-9|a-z|_]+)/i);
     if (token && token.length >= 2) {
         token = token[1];
         setState(1);
